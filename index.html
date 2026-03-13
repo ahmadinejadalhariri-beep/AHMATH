@@ -20,12 +20,21 @@
     position:absolute;inset:0;background:var(--card);border:1px solid var(--bdr);
     border-radius:28px;padding:44px 34px 60px;
     display:flex;flex-direction:column;justify-content:center;gap:14px;
-    opacity:0;transform:translateX(60px) scale(0.96);
-    transition:all .42s cubic-bezier(.4,0,.2,1);pointer-events:none;overflow:hidden;
+    opacity:0;transform:translateX(0) scale(0.96);
+    transition:opacity .38s cubic-bezier(.4,0,.2,1), transform .38s cubic-bezier(.4,0,.2,1);
+    pointer-events:none;overflow:hidden;
   }
   .slide::before{content:'';position:absolute;top:-100px;right:-80px;width:280px;height:280px;background:radial-gradient(circle,rgba(37,99,235,.1) 0%,transparent 70%);pointer-events:none;}
-  .slide.active{opacity:1;transform:translateX(0) scale(1);pointer-events:all;}
-  .slide.exit{opacity:0;transform:translateX(-60px) scale(0.96);}
+  /* entering from right (forward nav) */
+  .slide.enter-right { opacity:0; transform:translateX(64px) scale(0.96); }
+  /* entering from left (backward nav) */
+  .slide.enter-left  { opacity:0; transform:translateX(-64px) scale(0.96); }
+  /* active = center */
+  .slide.active { opacity:1; transform:translateX(0) scale(1); pointer-events:all; }
+  /* exit to left (forward nav — old slide) */
+  .slide.exit-left  { opacity:0; transform:translateX(-64px) scale(0.96); }
+  /* exit to right (backward nav — old slide) */
+  .slide.exit-right { opacity:0; transform:translateX(64px) scale(0.96); }
   .snum{position:absolute;top:20px;right:26px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut);letter-spacing:1px;}
   .pbar{position:absolute;bottom:0;left:0;height:3px;background:var(--blue);border-radius:0 0 0 28px;box-shadow:0 0 8px var(--blue);transition:width .4s ease;}
   h1{font-family:'Syne',sans-serif;font-size:clamp(36px,9vw,54px);font-weight:800;line-height:1.0;}
@@ -78,7 +87,7 @@
   .ic{width:20px;height:20px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
   .pg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .pb{background:rgba(37,99,235,.1);border:1px solid var(--bdr);border-radius:12px;padding:11px 13px;}
-  .pb.hot{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.3);}
+  .pb.hot{background:rgba(52,211,153,.09);border-color:rgba(52,211,153,.4);}
   .ptag{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
   .pv{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--yel);}
   .pn{font-size:11px;color:var(--mut);}
@@ -102,7 +111,7 @@
   <!-- 01 Hook -->
   <div class="slide active" id="s0">
     <div class="deco">!</div>
-    <div class="tag">📅 UTBK 2025</div>
+    <div class="tag">📅 UTBK 2026</div>
     <h1>Sebentar<br>lagi<br><span class="bl">UTBK.</span></h1>
     <p>Aku mau share strategi ngerjain <strong>PK PM</strong> yang jarang banget dibahas — tapi justru paling bikin perbedaan.</p>
     <div class="sh">swipe <span class="aa">→→→</span></div>
@@ -254,9 +263,14 @@
       <div class="bi"><div class="ic">✓</div> Grup Diskusi Bersama Tutor</div>
     </div>
     <div class="pg">
-      <div class="pb hot"><div class="ptag">🔥 Promo s/d 23 Mar</div><div class="pv">Rp179k</div><div class="pn">per orang</div></div>
+      <div class="pb"><div class="ptag">🔥 Promo s/d 23 Mar</div><div class="pv">Rp179k</div><div class="pn">per orang</div></div>
       <div class="pb"><div class="ptag">Kolektif 3 orang</div><div class="pv">Rp149k</div><div class="pn">per orang</div></div>
-      <div class="pb" style="grid-column:1/-1"><div class="ptag">Kolektif 5 orang</div><div class="pv">Rp99k <span style="font-size:12px;color:var(--mut);font-weight:400">/ orang</span></div></div>
+      <div class="pb hot" style="grid-column:1/-1;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;right:0;background:var(--grn);color:#050810;font-family:'Syne',sans-serif;font-size:9px;font-weight:800;padding:3px 10px;border-radius:0 12px 0 8px;letter-spacing:.5px;text-transform:uppercase;">BEST DEAL</div>
+        <div class="ptag">👥 Kolektif 5 orang</div>
+        <div class="pv" style="font-size:24px;">Rp99k <span style="font-size:12px;color:var(--mut);font-weight:400">/ orang</span></div>
+        <div class="pn">Hemat paling banyak — ajak teman sekarang!</div>
+      </div>
     </div>
     <div class="tl"><div class="td"></div> Daftar: 14 Mar – 3 Apr <div class="tl2"></div><div class="td"></div> Kelas: 4 – 19 Apr</div>
     <a href="https://bit.ly/TaklukkanUTBK" class="btn">🚀 Daftar — bit.ly/TaklukkanUTBK</a>
@@ -273,7 +287,9 @@
 
 <script>
 /* ══════════════════════════════════════════
-   NAVIGATION
+   NAVIGATION — DIRECTIONAL ANIMATION
+   forward  (next): old → exit-left,  new ← enter-right
+   backward (prev): old → exit-right, new ← enter-left
 ══════════════════════════════════════════ */
 const TOTAL=11; let cur=0;
 const slides=Array.from(document.querySelectorAll('.slide'));
@@ -283,14 +299,35 @@ for(let i=0;i<TOTAL;i++){
   d.className='nd'+(i===0?' active':'');
   d.onclick=()=>goTo(i); ndsEl.appendChild(d);
 }
+
 function goTo(n){
-  if(n<0||n>=TOTAL)return;
-  const p=cur;
-  slides[p].classList.remove('active'); slides[p].classList.add('exit');
-  setTimeout(()=>slides[p].classList.remove('exit'),450);
-  cur=n; slides[cur].classList.add('active');
+  if(n<0||n>=TOTAL||n===cur)return;
+  const prev=cur;
+  const forward = n > prev;
+
+  // 1. Set entering slide off-screen (no transition yet)
+  slides[n].style.transition='none';
+  slides[n].classList.remove('active','enter-right','enter-left','exit-left','exit-right');
+  slides[n].classList.add(forward ? 'enter-right' : 'enter-left');
+
+  // 2. Force reflow so the off-screen position is painted
+  slides[n].offsetWidth;
+
+  // 3. Re-enable transition and animate both slides
+  slides[n].style.transition='';
+  slides[prev].classList.remove('active');
+  slides[prev].classList.add(forward ? 'exit-left' : 'exit-right');
+  slides[n].classList.remove('enter-right','enter-left');
+  slides[n].classList.add('active');
+
+  // 4. Clean up exit class after animation
+  const exitEl=slides[prev];
+  setTimeout(()=>exitEl.classList.remove('exit-left','exit-right'),420);
+
+  cur=n;
   document.querySelectorAll('.nd').forEach((d,i)=>d.classList.toggle('active',i===cur));
 }
+
 document.getElementById('pb').onclick=()=>goTo(cur-1);
 document.getElementById('nb').onclick=()=>goTo(cur+1);
 document.addEventListener('keydown',e=>{
