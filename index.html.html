@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PK PM HACKS — UTBK Strategy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#050810; --card:#0c1225; --blue:#2563EB; --bb:#3B82F6;
+    --glow:rgba(59,130,246,0.15); --acc:#60A5FA; --w:#F0F4FF;
+    --mut:#6B7DB3; --red:#F87171; --grn:#34D399; --yel:#FBBF24;
+    --bdr:rgba(59,130,246,0.2);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--w);height:100dvh;display:flex;align-items:center;justify-content:center;overflow:hidden;user-select:none;}
+  .stage{position:relative;width:min(430px,100vw);height:min(750px,100dvh);}
+  .slide{
+    position:absolute;inset:0;background:var(--card);border:1px solid var(--bdr);
+    border-radius:28px;padding:44px 34px 60px;
+    display:flex;flex-direction:column;justify-content:center;gap:14px;
+    opacity:0;transform:translateX(60px) scale(0.96);
+    transition:all .42s cubic-bezier(.4,0,.2,1);pointer-events:none;overflow:hidden;
+  }
+  .slide::before{content:'';position:absolute;top:-100px;right:-80px;width:280px;height:280px;background:radial-gradient(circle,rgba(37,99,235,.1) 0%,transparent 70%);pointer-events:none;}
+  .slide.active{opacity:1;transform:translateX(0) scale(1);pointer-events:all;}
+  .slide.exit{opacity:0;transform:translateX(-60px) scale(0.96);}
+  .snum{position:absolute;top:20px;right:26px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut);letter-spacing:1px;}
+  .pbar{position:absolute;bottom:0;left:0;height:3px;background:var(--blue);border-radius:0 0 0 28px;box-shadow:0 0 8px var(--blue);transition:width .4s ease;}
+  h1{font-family:'Syne',sans-serif;font-size:clamp(36px,9vw,54px);font-weight:800;line-height:1.0;}
+  h2{font-family:'Syne',sans-serif;font-size:clamp(20px,5vw,27px);font-weight:700;line-height:1.2;}
+  h3{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:2px;}
+  p{font-size:15px;line-height:1.65;color:#C5D0F0;}
+  .bl{color:var(--bb);} .rd{color:var(--red);} .gn{color:var(--grn);} .yl{color:var(--yel);}
+  strong{color:var(--w);font-weight:600;}
+  .tag{display:inline-block;background:var(--glow);border:1px solid var(--bdr);color:var(--acc);font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 12px;border-radius:6px;letter-spacing:1.5px;text-transform:uppercase;width:fit-content;}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:var(--grn);font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;width:fit-content;}
+  .callout{background:rgba(37,99,235,.1);border-left:3px solid var(--blue);border-radius:0 12px 12px 0;padding:13px 16px;font-size:14px;color:#C5D0F0;line-height:1.6;}
+  .stat-row{display:flex;gap:12px;}
+  .sbox{flex:1;background:rgba(37,99,235,.08);border:1px solid var(--bdr);border-radius:14px;padding:14px;text-align:center;}
+  .sbox .num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--bb);line-height:1;}
+  .sbox .lbl{font-size:11px;color:var(--mut);margin-top:4px;line-height:1.3;}
+  .steps{display:flex;flex-direction:column;gap:10px;}
+  .step{display:flex;align-items:flex-start;gap:14px;}
+  .sn{flex-shrink:0;width:28px;height:28px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:white;}
+  .st{font-size:14px;color:#C5D0F0;padding-top:4px;line-height:1.5;}
+  .formula{background:rgba(37,99,235,.08);border:1px solid var(--blue);border-radius:16px;padding:18px 24px;text-align:center;}
+  .feq{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--w);letter-spacing:2px;}
+  .fsub{font-size:11px;color:var(--mut);margin-top:10px;display:flex;justify-content:center;gap:18px;}
+  .fsub span{display:flex;align-items:center;gap:4px;}
+  .fd{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .code{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#C5D0F0;line-height:2.1;background:rgba(0,0,0,.35);padding:14px 16px;border-radius:12px;border-left:3px solid var(--grn);}
+  .ca{color:var(--grn);font-size:14px;font-weight:700;}
+  .cmp{display:flex;gap:10px;}
+  .cbox{flex:1;border-radius:14px;padding:14px;border:1px solid;}
+  .cbox.bad{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.25);}
+  .cbox.ok{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.25);}
+  .clbl{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:6px;}
+  .cbox.bad .clbl{color:var(--red);} .cbox.ok .clbl{color:var(--grn);}
+  .ct{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;line-height:1;}
+  .cbox.bad .ct{color:var(--red);} .cbox.ok .ct{color:var(--grn);}
+  .cd{font-size:11.5px;color:var(--mut);margin-top:5px;line-height:1.4;}
+  .pr{display:flex;align-items:center;gap:16px;}
+  .pm{display:flex;flex-direction:column;gap:10px;}
+  .mi{display:flex;align-items:center;gap:8px;font-size:13px;}
+  .md{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .mv{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
+  .sh{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut);display:flex;align-items:center;gap:6px;}
+  .aa{display:inline-block;animation:sr 1.5s ease-in-out infinite;}
+  @keyframes sr{0%,100%{transform:translateX(0);opacity:.4;}50%{transform:translateX(5px);opacity:1;}}
+  .deco{position:absolute;bottom:55px;right:16px;font-family:'Syne',sans-serif;font-size:90px;font-weight:800;color:rgba(37,99,235,.07);pointer-events:none;line-height:1;}
+  .scta{justify-content:flex-start;padding-top:34px;gap:12px;background:linear-gradient(145deg,#0a1628,#0c1e3d);border-color:rgba(59,130,246,.4);}
+  .pt{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;line-height:.9;color:var(--w);}
+  .pt span{-webkit-text-stroke:2px var(--bb);color:transparent;}
+  .bl2{display:flex;flex-direction:column;gap:7px;}
+  .bi{display:flex;align-items:center;gap:10px;font-size:13px;color:#C5D0F0;}
+  .ic{width:20px;height:20px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+  .pg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .pb{background:rgba(37,99,235,.1);border:1px solid var(--bdr);border-radius:12px;padding:11px 13px;}
+  .pb.hot{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.3);}
+  .ptag{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+  .pv{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--yel);}
+  .pn{font-size:11px;color:var(--mut);}
+  .tl{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mut);}
+  .td{width:7px;height:7px;background:var(--blue);border-radius:50%;flex-shrink:0;}
+  .tl2{flex:1;height:1px;background:var(--bdr);}
+  .btn{display:block;background:var(--blue);color:white;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;text-align:center;padding:13px;border-radius:12px;border:none;cursor:pointer;text-decoration:none;box-shadow:0 0 20px rgba(37,99,235,.4);transition:all .2s;}
+  .btn:hover{background:#1D4ED8;transform:translateY(-1px);}
+  .nav{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;z-index:10;}
+  .nb{width:34px;height:34px;background:rgba(255,255,255,.06);border:1px solid var(--bdr);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--mut);font-size:15px;transition:all .2s;}
+  .nb:hover{background:var(--glow);color:var(--w);}
+  .nds{display:flex;gap:5px;align-items:center;}
+  .nd{width:5px;height:5px;border-radius:50%;background:var(--mut);transition:all .3s;cursor:pointer;}
+  .nd.active{background:var(--bb);width:16px;border-radius:3px;}
+  canvas{border-radius:10px;}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- 01 Hook -->
+  <div class="slide active" id="s0">
+    <div class="deco">!</div>
+    <div class="tag">📅 UTBK 2025</div>
+    <h1>Sebentar<br>lagi<br><span class="bl">UTBK.</span></h1>
+    <p>Aku mau share strategi ngerjain <strong>PK PM</strong> yang jarang banget dibahas — tapi justru paling bikin perbedaan.</p>
+    <div class="sh">swipe <span class="aa">→→→</span></div>
+    <div class="pbar" style="width:9.09%"></div><span class="snum">01 / 11</span>
+  </div>
+
+  <!-- 02 Problem -->
+  <div class="slide" id="s1">
+    <div class="badge">💡 Insight</div>
+    <h2>Kenapa banyak yang <span class="rd">gagal</span> PK PM?</h2>
+    <p>Bukan karena nggak bisa ngerjain soalnya.</p>
+    <div class="callout">Banyak orang gagal bukan karena <strong>ga bisa</strong>, tapi karena kehabisan <strong class="yl">WAKTU.</strong></div>
+    <p>Dan itu masalah yang bisa diselesaikan — kalau tau caranya.</p>
+    <div class="sh">swipe <span class="aa">→→→</span></div>
+    <div class="pbar" style="width:18.18%"></div><span class="snum">02 / 11</span>
+  </div>
+
+  <!-- 03 Time Math -->
+  <div class="slide" id="s2">
+    <div class="badge">⏱ Time Breakdown</div>
+    <h2>20 soal dalam <span class="bl">20 menit</span></h2>
+    <div class="stat-row">
+      <div class="sbox"><div class="num">15–30</div><div class="lbl">detik baca<br>+ mikir ide</div></div>
+      <div class="sbox"><div class="num">2–3×</div><div class="lbl">baca ulang<br>kalau panik</div></div>
+    </div>
+    <div class="callout">Sisa waktu murni buat ngitung? Cuma <strong class="rd">30–45 detik/soal.</strong></div>
+    <p style="font-size:13px;color:var(--mut)">Cara konvensional yang diajarin di sekolah <em>tidak cukup cepat</em> untuk kondisi ini.</p>
+    <div class="sh">swipe <span class="aa">→→→</span></div>
+    <div class="pbar" style="width:27.27%"></div><span class="snum">03 / 11</span>
+  </div>
+
+  <!-- 04 Challenge -->
+  <div class="slide" id="s3">
+    <h3>Tantangan Langsung</h3>
+    <h2>Berapa luas bangun datar ini <span style="color:var(--mut);font-size:14px">(dalam satuan)</span>?</h2>
+    <div style="display:flex;justify-content:center;">
+      <canvas id="cvChallenge" width="210" height="168"></canvas>
+    </div>
+    <p style="font-size:13px;text-align:center;">⏸ Pause. Coba kerjain, dan catat butuh berapa lama!</p>
+    <div class="sh">swipe <span class="aa">→→→</span></div>
+    <div class="pbar" style="width:36.36%"></div><span class="snum">04 / 11</span>
+  </div>
+
+  <!-- 05 Standard Method -->
+  <div class="slide" id="s4">
+    <h3>Cara Biasa</h3>
+    <h2>Pecah jadi segitiga &amp; persegi panjang</h2>
+    <div style="display:flex;gap:14px;align-items:center;">
+      <canvas id="cvStandard" width="188" height="168"></canvas>
+      <div class="code" style="flex:1;font-size:11.5px;line-height:2;">
+        L<sub>I</sub>&nbsp;&nbsp;= ½×1×2 = 1<br>
+        L<sub>II</sub>&nbsp;= ½×2×1 = 1<br>
+        L<sub>III</sub>= ½×1×3 = 1.5<br>
+        L<sub>IV</sub>&nbsp;= 2×2 = 4<br>
+        <span class="ca">∴ L = 7.5 ✓</span>
+      </div>
+    </div>
+    <p style="font-size:12.5px;color:var(--mut)">Jawabannya benar — tapi butuh setidaknya <strong class="rd">1–2 menit.</strong></p>
+    <div class="sh">swipe <span class="aa">→→→</span></div>
+    <div class="pbar" style="width:45.45%"></div><span class="snum">05 / 11</span>
+  </div>
+
+  <!-- 06 Tease -->
+  <div class="slide" id="s5">
+    <div class="deco">?</div>
+    <h2>Padahal bisa diselesaikan<br>jauh lebih <span class="gn">cepat</span></h2>
+    <p>Tanpa perlu corat-coret panjang. Tanpa perlu mecah bangun satu-satu. Tanpa perlu panik.</p>
+    <div class="callout">Ada satu trik yang <strong>jarang diajarkan di sekolah</strong> — tapi justru inilah yang membedakan skor biasa dengan skor <strong class="bl">880+.</strong></div>
+    <div class="sh">swipe <span class="aa">→→→</span></div>
+    <div class="pbar" style="width:54.54%"></div><span class="snum">06 / 11</span>
+  </div>
+
+  <!-- 07 Pick's Intro -->
+  <div class="slide" id="s6">
+    <div class="tag">✨ The Shortcut</div>
+    <h2>Kenalin: <span class="bl">Pick's Theorem</span></h2>
+    <div class="steps">
+      <div class="step"><div class="sn">1</div><div class="st">Hitung titik yang ada di <strong>DALAM</strong> bangun → <strong>I</strong></div></div>
+      <div class="step"><div class="sn">2</div><div class="st">Hitung titik yang ada di <strong>GARIS PINGGIR</strong>, lalu bagi 2 → <strong>B/2</strong></div></div>
+      <div class="step"><div class="sn">3</div><div class="st">Jumlahkan keduanya, lalu <strong>kurangi satu</strong></div></div>
+    </div>
+    <div class="formula">
+      <div class="feq">L = I + B/2 − 1</div>
+      <div class="fsub">
+        <span><span class="fd" style="background:var(--bb)"></span>I = titik dalam</span>
+        <span><span class="fd" style="background:var(--red)"></span>B = titik batas</span>
+        <span><span class="fd" style="background:var(--grn)"></span>L = luas</span>
+      </div>
+    </div>
+    <div class="sh">swipe <span class="aa">→→→</span></div>
+    <div class="pbar" style="width:63.63%"></div><span class="snum">07 / 11</span>
+  </div>
+
+  <!-- 08 Pick's Demo -->
+  <div class="slide" id="s7">
+    <h3>Demo Langsung — Soal Yang Sama</h3>
+    <h2>via <span class="bl">Pick's Theorem</span></h2>
+    <div class="pr">
+      <canvas id="cvPicks" width="188" height="168"></canvas>
+      <div style="display:flex;flex-direction:column;gap:10px;flex:1;">
+        <div class="pm">
+          <div class="mi"><span class="md" style="background:var(--bb)"></span><span style="font-size:12px;color:var(--mut);flex:1">I (dalam)</span><span class="mv bl">5</span></div>
+          <div class="mi"><span class="md" style="background:var(--red)"></span><span style="font-size:12px;color:var(--mut);flex:1">B (batas)</span><span class="mv rd">7</span></div>
+        </div>
+        <div class="code" style="font-size:12px;line-height:1.9;">
+          L = 5 + 7/2 − 1<br>
+          L = 5 + 3.5 − 1<br>
+          <span class="ca">L = 7.5 ✓</span>
+        </div>
+      </div>
+    </div>
+    <div class="badge">⚡ Estimasi waktu: 15–30 detik!</div>
+    <div class="sh">swipe <span class="aa">→→→</span></div>
+    <div class="pbar" style="width:72.72%"></div><span class="snum">08 / 11</span>
+  </div>
+
+  <!-- 09 Comparison -->
+  <div class="slide" id="s8">
+    <h3>Perbandingan</h3>
+    <h2>Kamu vs <span style="color:var(--mut)">sainganmu</span></h2>
+    <div class="cmp">
+      <div class="cbox bad"><div class="clbl">❌ Cara biasa</div><div class="ct">2 menit</div><div class="cd">Pecah-pecah, hitung satu per satu, panik, kehabisan waktu</div></div>
+      <div class="cbox ok"><div class="clbl">✅ Pick's Theorem</div><div class="ct">15 dtk</div><div class="cd">Hitung titik, masukkan rumus, selesai — hemat waktu buat soal lainnya</div></div>
+    </div>
+    <div class="callout">Soal <strong>PK/PM UTBK</strong> banyak yang dirancang untuk di-solve pakai jalur cepat. Sayangnya, metode ini jarang banget diajarin di sekolah.</div>
+    <div class="sh">swipe <span class="aa">→→→</span></div>
+    <div class="pbar" style="width:81.81%"></div><span class="snum">09 / 11</span>
+  </div>
+
+  <!-- 10 Solution Tease -->
+  <div class="slide" id="s9">
+    <div class="deco">→</div>
+    <div class="badge">🎯 Solusinya</div>
+    <h2>Matengin semua strateginya<br><span class="bl">dari sekarang</span></h2>
+    <p>Daripada nyesel kehabisan waktu pas hari H, lebih baik kita pelajari semua hacks, pola pikir cepat, dan pengalaman nyata yang terbukti menghasilkan skor <strong>880+.</strong></p>
+    <p style="color:var(--mut);font-size:13.5px">Pick's Theorem hanyalah satu dari sekian banyak trik yang bisa menghemat puluhan menit di hari ujian.</p>
+    <div class="sh">swipe <span class="aa">→→→</span></div>
+    <div class="pbar" style="width:90.9%"></div><span class="snum">10 / 11</span>
+  </div>
+
+  <!-- 11 CTA -->
+  <div class="slide scta" id="s10">
+    <div class="pt">PK PM<br><span>HACKS</span></div>
+    <p style="font-size:12px;color:var(--mut);margin-top:-6px">Hemat Waktu Pengerjaan, Maksimalkan Skor UTBK</p>
+    <div class="bl2">
+      <div class="bi"><div class="ic">✓</div> 20 Jam Live Class Intensif</div>
+      <div class="bi"><div class="ic">✓</div> Rekaman Live Class</div>
+      <div class="bi"><div class="ic">✓</div> Materi + Trik Cepat Pengerjaan Soal</div>
+      <div class="bi"><div class="ic">✓</div> Grup Diskusi Bersama Tutor</div>
+    </div>
+    <div class="pg">
+      <div class="pb hot"><div class="ptag">🔥 Promo s/d 23 Mar</div><div class="pv">Rp179k</div><div class="pn">per orang</div></div>
+      <div class="pb"><div class="ptag">Kolektif 3 orang</div><div class="pv">Rp149k</div><div class="pn">per orang</div></div>
+      <div class="pb" style="grid-column:1/-1"><div class="ptag">Kolektif 5 orang</div><div class="pv">Rp99k <span style="font-size:12px;color:var(--mut);font-weight:400">/ orang</span></div></div>
+    </div>
+    <div class="tl"><div class="td"></div> Daftar: 14 Mar – 3 Apr <div class="tl2"></div><div class="td"></div> Kelas: 4 – 19 Apr</div>
+    <a href="https://bit.ly/TaklukkanUTBK" class="btn">🚀 Daftar — bit.ly/TaklukkanUTBK</a>
+    <div class="pbar" style="width:100%"></div><span class="snum">11 / 11</span>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav" id="nav">
+    <div class="nb" id="pb">←</div>
+    <div class="nds" id="nds"></div>
+    <div class="nb" id="nb">→</div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+const TOTAL=11; let cur=0;
+const slides=Array.from(document.querySelectorAll('.slide'));
+const ndsEl=document.getElementById('nds');
+for(let i=0;i<TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='nd'+(i===0?' active':'');
+  d.onclick=()=>goTo(i); ndsEl.appendChild(d);
+}
+function goTo(n){
+  if(n<0||n>=TOTAL)return;
+  const p=cur;
+  slides[p].classList.remove('active'); slides[p].classList.add('exit');
+  setTimeout(()=>slides[p].classList.remove('exit'),450);
+  cur=n; slides[cur].classList.add('active');
+  document.querySelectorAll('.nd').forEach((d,i)=>d.classList.toggle('active',i===cur));
+}
+document.getElementById('pb').onclick=()=>goTo(cur-1);
+document.getElementById('nb').onclick=()=>goTo(cur+1);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')goTo(cur+1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')goTo(cur-1);
+});
+let _tx=0;
+const stg=document.getElementById('stage');
+stg.addEventListener('touchstart',e=>_tx=e.touches[0].clientX,{passive:true});
+stg.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-_tx;if(dx<-40)goTo(cur+1);if(dx>40)goTo(cur-1);},{passive:true});
+
+/* ══════════════════════════════════════════
+   CANVAS — VERIFIED MATH
+   ─────────────────────────────────────────
+   Polygon vertices (grid):
+     A=(0,0)  B=(4,0)  C=(3,2)  D=(1,3)
+
+   Shoelace area:
+     ½|0(0-3)+4(2-0)+3(3-0)+1(0-2)|
+     = ½|0+8+9-2| = ½×15 = 7.5 ✓
+
+   Boundary B=7 (count each lattice point on edges once):
+     Edge AB (0,0)→(4,0): gcd(4,0)=4 → 3 interior pts: (1,0)(2,0)(3,0)
+     Edge BC (4,0)→(3,2): gcd(1,2)=1 → 0 interior pts
+     Edge CD (3,2)→(1,3): gcd(2,1)=1 → 0 interior pts
+     Edge DA (1,3)→(0,0): gcd(1,3)=1 → 0 interior pts
+     4 vertices + 3 interior = B=7 ✓
+     Full list: (0,0)(1,0)(2,0)(3,0)(4,0)(3,2)(1,3)
+
+   Interior I=5:
+     Row y=1: x must satisfy x>y/3=0.33 AND x<4-y/2=3.5
+       → x=1,2,3 → (1,1)(2,1)(3,1)
+     Row y=2: x must satisfy x>2/3≈0.67 AND x<3 (vertex C is on boundary)
+       → x=1,2 → (1,2)(2,2)
+     Total I=5 ✓
+
+   Pick's check: I+B/2-1 = 5+3.5-1 = 7.5 ✓
+
+   Standard decomposition (cut at x=1, x=3, y=2):
+     L_III = left  triangle (0,0)(1,0)(1,3)   = ½×1×3 = 1.5
+     L_IV  = rectangle      (1,0)(3,0)(3,2)(1,2) = 2×2 = 4
+     L_II  = top   triangle (1,2)(3,2)(1,3)   = ½×2×1 = 1
+     L_I   = right triangle (3,0)(4,0)(3,2)   = ½×1×2 = 1
+     Total = 7.5 ✓
+
+   Grid display: x=0..5, y=0..4 (1-cell margin)
+   CELL=28px, PAD=16px
+   Canvas 210×168 (challenge), 188×168 (standard & picks)
+   toScreen: sx = PAD+gx*CELL,  sy = H-PAD-gy*CELL  (flip y)
+══════════════════════════════════════════ */
+
+const CELL=28, PAD=16;
+const VERTS=[[0,0],[4,0],[3,2],[1,3]];
+
+function gs(cvs,gx,gy){return[PAD+gx*CELL, cvs.height-PAD-gy*CELL];}
+
+function drawGrid(ctx,cvs){
+  ctx.strokeStyle='rgba(99,130,200,0.18)'; ctx.lineWidth=0.5;
+  // vertical lines x=0..5
+  for(let gx=0;gx<=5;gx++){
+    const x=PAD+gx*CELL;
+    ctx.beginPath();ctx.moveTo(x,PAD-2);ctx.lineTo(x,cvs.height-PAD+2);ctx.stroke();
+  }
+  // horizontal lines y=0..4
+  for(let gy=0;gy<=4;gy++){
+    const y=cvs.height-PAD-gy*CELL;
+    ctx.beginPath();ctx.moveTo(PAD-2,y);ctx.lineTo(cvs.width-PAD+2,y);ctx.stroke();
+  }
+}
+
+function drawPoly(ctx,cvs,fill,stroke,lw=2.5){
+  ctx.beginPath();
+  const[x0,y0]=gs(cvs,VERTS[0][0],VERTS[0][1]);
+  ctx.moveTo(x0,y0);
+  for(let i=1;i<VERTS.length;i++){
+    const[x,y]=gs(cvs,VERTS[i][0],VERTS[i][1]);ctx.lineTo(x,y);
+  }
+  ctx.closePath();
+  ctx.fillStyle=fill;ctx.fill();
+  ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke();
+}
+
+function drawDot(ctx,cvs,gx,gy,color,r){
+  const[x,y]=gs(cvs,gx,gy);
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fillStyle=color;ctx.fill();
+}
+
+/* ── SLIDE 4: Challenge ── */
+function renderChallenge(){
+  const cvs=document.getElementById('cvChallenge');
+  const ctx=cvs.getContext('2d');
+  drawGrid(ctx,cvs);
+  drawPoly(ctx,cvs,'rgba(37,99,235,0.18)','#3B82F6');
+  // 4 vertices in red
+  VERTS.forEach(([gx,gy])=>drawDot(ctx,cvs,gx,gy,'#F87171',5.5));
+}
+
+/* ── SLIDE 5: Standard Decomposition ──
+   Cut lines:
+     vertical   x=1 from (1,0)→(1,3)=D
+     vertical   x=3 from (3,0)→(3,2)=C
+     horizontal y=2 from (1,2)→(3,2)=C
+   Region label centroids:
+     I   (right tri  (3,0)(4,0)(3,2)):  (10/3, 2/3) ≈ (3.45, 0.67)
+     II  (top   tri  (1,2)(3,2)(1,3)):  (5/3,  7/3) ≈ (1.67, 2.25)
+     III (left  tri  (0,0)(1,0)(1,3)):  (2/3,  1.0) ≈ (0.55, 1.0)
+     IV  (rect  (1,0)(3,0)(3,2)(1,2)):  (2,    1.0)
+*/
+function renderStandard(){
+  const cvs=document.getElementById('cvStandard');
+  const ctx=cvs.getContext('2d');
+  drawGrid(ctx,cvs);
+  drawPoly(ctx,cvs,'rgba(37,99,235,0.15)','#3B82F6');
+
+  // Cut lines (dashed yellow)
+  ctx.strokeStyle='rgba(251,191,36,0.65)';ctx.lineWidth=1.2;ctx.setLineDash([4,3]);
+
+  // vertical x=1: (1,0)→(1,3)
+  {const[x1,y1]=gs(cvs,1,0);const[x2,y2]=gs(cvs,1,3);
+   ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+
+  // vertical x=3: (3,0)→(3,2)
+  {const[x1,y1]=gs(cvs,3,0);const[x2,y2]=gs(cvs,3,2);
+   ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+
+  // horizontal y=2: (1,2)→(3,2)
+  {const[x1,y1]=gs(cvs,1,2);const[x2,y2]=gs(cvs,3,2);
+   ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+
+  ctx.setLineDash([]);
+
+  // Labels
+  ctx.fillStyle='#FBBF24';ctx.font='bold 11px Syne,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  {const[x,y]=gs(cvs,3.45,0.72);ctx.fillText('I',x,y);}    // right triangle
+  {const[x,y]=gs(cvs,1.67,2.25);ctx.fillText('II',x,y);}   // top triangle
+  {const[x,y]=gs(cvs,0.48,1.1); ctx.fillText('III',x,y);}  // left triangle
+  {const[x,y]=gs(cvs,2.0, 1.0); ctx.fillText('IV',x,y);}   // rectangle
+
+  // Vertices
+  VERTS.forEach(([gx,gy])=>drawDot(ctx,cvs,gx,gy,'#F87171',4.5));
+}
+
+/* ── SLIDE 8: Pick's Theorem ──
+   Interior (blue) — I=5: (1,1)(2,1)(3,1)(1,2)(2,2)
+   Boundary (red)  — B=7: (0,0)(1,0)(2,0)(3,0)(4,0)(3,2)(1,3)
+*/
+function renderPicks(){
+  const cvs=document.getElementById('cvPicks');
+  const ctx=cvs.getContext('2d');
+  drawGrid(ctx,cvs);
+  drawPoly(ctx,cvs,'rgba(37,99,235,0.15)','#3B82F6');
+
+  // Interior points — blue
+  [[1,1],[2,1],[3,1],[1,2],[2,2]].forEach(([gx,gy])=>
+    drawDot(ctx,cvs,gx,gy,'#60A5FA',4.5));
+
+  // Boundary points — red (larger, drawn on top)
+  [[0,0],[1,0],[2,0],[3,0],[4,0],[3,2],[1,3]].forEach(([gx,gy])=>
+    drawDot(ctx,cvs,gx,gy,'#F87171',5.5));
+}
+
+setTimeout(()=>{
+  renderChallenge();
+  renderStandard();
+  renderPicks();
+},150);
+</script>
+</body>
+</html>
